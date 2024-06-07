@@ -36,22 +36,29 @@ Number between 0 and 15
 3. Based on the provided information, you should choose your action for the current round. Your action should be a number between 0 and 15. You should provide your action in the following format:
 ```
 <action>
-   Number between 0 and 15
+Number between 0 and 15
 </action>
 ```
 
 4. After choosing your action, you will receive your scores for the round, in the following format:
 ```
-<score>
-   Your score: score
-</score>
+<score>Your score</score>
+<opponent_choices>
+    Player 1: <choice>
+    Player 2: <choice>
+    ...
+    Player N: <choice>
+</opponent_choices>
 ```
 
 5. Based on the scores and your analysis of the game, you should provide your bet for the next round. Your bet should be a number between 0 and 15. You should provide it in the following format:
 ```
 <personal_bet>
-   Number between 0 and 15
+Number between 0 and 15
 </personal_bet>
 ```
 
-Please provide your responses in the specified format for each turn. For Turn 0, provide only your initial bet. For subsequent turns, analyze the bets of other players, consider the game rules and scoring rubric, and make strategic decisions to maximize your score. Good luck!"""
+Please provide your responses in the specified format for each turn. For Turn 0, provide only your initial bet. For subsequent turns, analyze the bets of other players, consider the game rules and scoring rubric, and make strategic decisions to maximize your score. Good luck!
+
+Start playing the game when you see the prompt "Game Start".
+"""
