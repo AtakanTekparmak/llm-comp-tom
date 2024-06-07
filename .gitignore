@@ -4,3 +4,6 @@ venv/
 
 # Temporary test files
 temp_test/
+
+# The actual .env file
+.env

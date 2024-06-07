@@ -1,4 +1,4 @@
-from src.model import Model, OllamaModel
+from src.model import Model, OllamaModel, GroqModel
 
 import xml.etree.ElementTree as ET
 from xml.etree.ElementTree import ParseError
@@ -7,7 +7,8 @@ from xml.etree.ElementTree import ParseError
 MODELS = {
     "qwen2-0.5": "Qwen/Qwen2-0.5B-Instruct-MLX",
     "qwen2-1.5": "Qwen/Qwen2-1.5B-Instruct-MLX",
-    "qwen2-7":   "qwen2:7b-instruct-fp16"
+    "qwen2-7":   "qwen2:7b-instruct-fp16",
+    "llama3-70b": "llama3-70b-8192"
 }
 
 class Agent:
@@ -22,7 +23,8 @@ class Agent:
     def get_model_by_name(self, model_name: str):
         """Returns the model based on the name."""
         #return Model(model_name=MODELS[model_name])
-        return OllamaModel(model_name=MODELS[model_name])
+        #return OllamaModel(model_name=MODELS[model_name])
+        return GroqModel(model_name=MODELS[model_name])
     
     def extract_data(self, model_response: str, xml_tag: str):
         """Extracts data from the model response using the specified XML tag."""

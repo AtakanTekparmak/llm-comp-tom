@@ -1,5 +1,8 @@
 from mlx_lm import load, generate
 import ollama
+from groq import Groq
+
+from os import environ
 
 class Model:
     """A class to represent an MLX language model."""
@@ -37,3 +40,16 @@ class OllamaModel:
             messages=messages,
             options= {"num_predict": max_tokens}
         )["message"]["content"]
+    
+class GroqModel:
+    """A class to represent a Groq language model."""
+    def __init__(self, model_name: str):
+        self.model_name = model_name
+        self.groq = Groq(api_key=environ.get("GROQ_API_KEY"))
+
+    def generate(self, messages: list[dict], max_tokens: int = 32):
+        chat_completion = self.groq.chat.completions.create(
+            messages=messages,
+            model=self.model_name,
+        )
+        return chat_completion.choices[0].message.content
