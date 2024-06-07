@@ -19,6 +19,6 @@ def main():
     print("Overall Scores:")
     for player_name, score in overall_scores.items():
         print(f"{player_name}: {score}")
-        
+
 if __name__ == "__main__":
     main()

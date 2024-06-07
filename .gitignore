@@ -1,3 +1,6 @@
 # Python stuff
 __pycache__/
 venv/
+
+# Temporary test files
+temp_test/
