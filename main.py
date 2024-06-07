@@ -3,16 +3,14 @@ import random
 from src.player import Player
 from src.game import Game, GameConfig
 
-NUM_PLAYERS = 64
-NUM_ACTIONS = 16
-NUM_TURNS = 100
+# Define Player configuration
+PLAYERS_CONFIG = [
+    ("qwen2-0.5", 32),
+    ("qwen2-1.5", 32)
+]
 
 def main():
-    player_configs = [
-        ("qwen2-0.5", 32),
-        ("qwen2-1.5", 32)
-    ]
-    config = GameConfig(player_configs)
+    config = GameConfig(PLAYERS_CONFIG)
     game = Game(config)
     game.play()
     overall_scores = game.get_overall_scores()

@@ -1,9 +1,6 @@
 from src.player import Player
+from src.config import NUM_ACTIONS, NUM_PLAYERS, NUM_TURNS
 
-# Define constants
-NUM_ACTIONS = 16
-NUM_PLAYERS = 64
-NUM_TURNS = 100
 
 class GameConfig:
     """A class to store the configuration for a game."""
