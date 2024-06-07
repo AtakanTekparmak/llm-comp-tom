@@ -6,6 +6,7 @@ NUM_PLAYERS = 64
 NUM_TURNS = 100
 
 class GameConfig:
+    """A class to store the configuration for a game."""
     def __init__(self, player_configs: list[tuple[str, int]]):
         self.player_configs = player_configs
     
@@ -17,7 +18,8 @@ class GameConfig:
 
 class Game:
     def __init__(self, config: GameConfig):
-        self.players = config.create_players()
+        self.config = config
+        self.players = self.config.create_players()
         self.turn = 0
     
     def is_game_over(self) -> bool:

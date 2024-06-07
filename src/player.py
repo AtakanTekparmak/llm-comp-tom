@@ -1,5 +1,8 @@
 import random
 
+from src.agent import Agent
+from src.config import get_system_prompt
+
 # Define constants
 NUM_ACTIONS = 16
 
@@ -7,6 +10,7 @@ class Player:
     def __init__(self, name: str):
         self.name = name
         self.score = 0
+        self.agent = Agent(name, get_system_prompt())
     
     def get_name(self) -> str:
         return self.name
