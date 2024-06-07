@@ -33,7 +33,10 @@ class Agent:
 
     
     def start_playing(self):
-        """Starts the game by sending the system prompt."""
+        """
+        Starts the game by sending the system prompt. 
+        Returns the personal bet from the agent.
+        """
         # Add game start prompt to messages
         self.messages.append({"role": "user", "content": "Game Start"})
 
@@ -45,10 +48,14 @@ class Agent:
 
         # Add the personal bet to the messages
         self.messages.append({"role": "assistant", "content": personal_bet})
-
+        
+        return personal_bet
     
     def reveal_bets(self, round_number: int, public_bets: list[int]):
-        """Reveals the public bets to the agent."""
+        """
+        Reveals the public bets to the agent.
+        Returns the action from the agent.
+        """
         # Construct the bets data
         bets_data = "<round_number>" + str(round_number) + "</round_number>\n<bets>\n"
         for bet in public_bets:
@@ -67,8 +74,13 @@ class Agent:
         # Add the action to the messages
         self.messages.append({"role": "assistant", "content": action})
 
+        return action
+
     def reveal_score_and_actions(self, agent_score: float, opponent_actions: list[int]):
-        """Reveals the agent's score and opponent actions to the agent."""
+        """
+        Reveals the agent's score and opponent actions to the agent.
+        Returns the personal bet from the agent.
+        """
         # Construct the score and actions data
         score_actions_data = "<score>" + str(agent_score) + "</score>\n<opponent_choices>\n"
         for action in opponent_actions:
@@ -86,3 +98,5 @@ class Agent:
 
         # Add the feedback to the messages
         self.messages.append({"role": "assistant", "content": personal_bet})
+
+        return personal_bet
