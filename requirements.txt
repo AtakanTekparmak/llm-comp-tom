@@ -1,3 +1,6 @@
 # MLX & MLM-LM
 mlx 
 mlx-lm
+
+# Ollama
+ollama

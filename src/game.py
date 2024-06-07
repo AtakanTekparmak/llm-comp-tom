@@ -18,6 +18,7 @@ class Game:
         self.config = config
         self.players = self.config.create_players()
         self.turn = 0
+        self.previous_actions = []
     
     def is_game_over(self) -> bool:
         return self.turn >= NUM_TURNS
@@ -25,13 +26,17 @@ class Game:
     def play(self) -> None:
         while not self.is_game_over():
             # Step 1: Each player publicly bets on a number
-            public_bets = self.get_public_bets()
+            if self.turn > 0:
+                public_bets = self.get_public_bets()
+            else:
+                public_bets = [player.start_playing() for player in self.players]
             
             # Step 2: Each player privately chooses a number/action based on the public bets
             private_actions = self.get_private_actions(public_bets)
+            previous_actions = private_actions
             
             # Step 3: Calculate scores and update player points
-            scores = self.calculate_scores(public_bets, private_actions)
+            scores = self.calculate_scores(public_bets, previous_actions)
             self.update_player_points(scores)
             
             self.turn += 1
@@ -39,7 +44,8 @@ class Game:
     def get_public_bets(self) -> list[int]:
         public_bets = []
         for player in self.players:
-            bet = player.get_bet(NUM_ACTIONS)
+            bet = player.get_bet(previous_actions=self.previous_actions)
+            print(f"Player {player.get_name()} bet: {bet}")
             public_bets.append(bet)
         return public_bets
     
@@ -55,7 +61,7 @@ class Game:
         bet_influences = player.calculate_bet_influences(self.players, public_bets)
         
         # Use the bet influences to determine the player's action
-        action = player.choose_action(NUM_ACTIONS, bet_influences)
+        action = player.choose_action(self.turn, bet_influences)
         
         return action
     
@@ -64,6 +70,7 @@ class Game:
         action_counts = [0] * NUM_ACTIONS
         
         for action in private_actions:
+            print(action)
             action_counts[action] += 1
         
         for player, action in enumerate(private_actions):

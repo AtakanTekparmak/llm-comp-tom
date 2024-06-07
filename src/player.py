@@ -12,18 +12,17 @@ class Player:
     def get_name(self) -> str:
         return self.name
     
-    def get_bet(self, num_actions: int) -> int:
-        return random.randint(0, num_actions - 1)
+    def start_playing(self) -> int:
+        return self.agent.start_playing()
     
-    def choose_action(self, num_actions: int, bet_influences: list[int]) -> int:
-        return random.randint(0, num_actions - 1)
+    def get_bet(self, previous_actions: list[int]) -> int:
+        return self.agent.reveal_score_and_actions(self.score, previous_actions)
+    
+    def choose_action(self, turn: int, bet_influences: list[int]) -> int:
+        return self.agent.reveal_bets(turn, bet_influences)
     
     def calculate_bet_influences(self, players: list['Player'], public_bets: list[int]) -> list[int]:
-        bet_influences = [0] * NUM_ACTIONS
-        for i, bet in enumerate(public_bets):
-            if players[i] != self:
-                bet_influences[bet] += 1
-        return bet_influences
+        return public_bets
     
     def add_points(self, points: float) -> None:
         self.score += points

@@ -3,8 +3,9 @@ from src.config import NUM_PLAYERS
 
 # Define Player configuration
 PLAYERS_CONFIG = [
-    ("qwen2-0.5", NUM_PLAYERS // 2),
-    ("qwen2-1.5", NUM_PLAYERS // 2)
+    #("qwen2-1.5", NUM_PLAYERS // 2),
+    #("qwen2-0.5", NUM_PLAYERS // 2)
+    ("qwen2-7", NUM_PLAYERS)
 ]
 
 def main():

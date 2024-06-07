@@ -2,7 +2,7 @@ import tomllib
 
 # Define constants
 NUM_ACTIONS = 16
-NUM_PLAYERS = 32
+NUM_PLAYERS = 8
 NUM_TURNS = 100
 
 def load_config(config_path: str = "config.toml") -> dict:
