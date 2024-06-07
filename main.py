@@ -1,12 +1,10 @@
-import random
-
-from src.player import Player
 from src.game import Game, GameConfig
+from src.config import NUM_PLAYERS
 
 # Define Player configuration
 PLAYERS_CONFIG = [
-    ("qwen2-0.5", 32),
-    ("qwen2-1.5", 32)
+    ("qwen2-0.5", NUM_PLAYERS // 2),
+    ("qwen2-1.5", NUM_PLAYERS // 2)
 ]
 
 def main():
