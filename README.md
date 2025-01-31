@@ -26,6 +26,13 @@ To install the required packages, run the following command:
 make install
 ```
 
+## Environment Setup
+To set up the environment, run the following command:
+```bash
+make copy-env
+```
+This will create a `.env` file in the root directory. Then, add your OpenRouter API key to the `.env` file.
+
 ## Quickstart
 
 An example experiment setup is shown below (and provided in `main.py`). [OpenRouter](https://openrouter.ai/) is used as inference provider.
