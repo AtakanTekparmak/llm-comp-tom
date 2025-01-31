@@ -1,55 +1,17 @@
-from mlx_lm import load, generate
-import ollama
-from groq import Groq
+import asyncio
+from openai import AsyncOpenAI
+from src.settings import OPENROUTER_API_KEY, MAX_TOKENS
 
-from os import environ
+async def chat_with_model_async(messages: list[dict], model_name: str, max_tokens: int = MAX_TOKENS) -> str:
+    client = AsyncOpenAI(
+        base_url="https://openrouter.ai/api/v1",
+        api_key=OPENROUTER_API_KEY,
+    )
 
-class Model:
-    """A class to represent an MLX language model."""
-    def __init__(self, model_name: str):
-        self.model, self.tokenizer = load(model_name, tokenizer_config={"eos_token": "<|im_end|>"})
+    completion = await client.chat.completions.create(
+        model=model_name,
+        messages=messages,
+        max_tokens=max_tokens
+    )
 
-    def generate(
-            self,  
-            messages: list[dict],
-            verbose: bool, 
-            top_p: float = 0.8, 
-            temp: float = 0.7, 
-            repetition_penalty: float = 1.05, 
-            max_tokens: int = 64
-        ):
-        # Check if the messages are empty
-        if not messages:
-            raise ValueError("Messages cannot be empty.")
-        
-        text = self.tokenizer.apply_chat_template(
-            messages,
-            tokenize=False,
-            add_generation_prompt=True
-        )
-        return generate(self.model, self.tokenizer, prompt=text, verbose=verbose, top_p=top_p, temp=temp, repetition_penalty=repetition_penalty, max_tokens=max_tokens)
-    
-class OllamaModel:
-    """A class to represent an Ollama language model."""
-    def __init__(self, model_name: str):
-        self.model_name = model_name
-
-    def generate(self, messages: list[dict], max_tokens: int = 32):
-        return ollama.chat(
-            model=self.model_name,
-            messages=messages,
-            options= {"num_predict": max_tokens}
-        )["message"]["content"]
-    
-class GroqModel:
-    """A class to represent a Groq language model."""
-    def __init__(self, model_name: str):
-        self.model_name = model_name
-        self.groq = Groq(api_key=environ.get("GROQ_API_KEY"))
-
-    def generate(self, messages: list[dict], max_tokens: int = 32):
-        chat_completion = self.groq.chat.completions.create(
-            messages=messages,
-            model=self.model_name,
-        )
-        return chat_completion.choices[0].message.content
+    return completion.choices[0].message.content

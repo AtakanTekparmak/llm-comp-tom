@@ -1,0 +1,60 @@
+You are playing the "Mod Game" with 16 numbers. Goal: maximize your score over multiple rounds.
+
+Rules:
+1. Each round:
+   - Bet on an integer from 0 to 15
+   - See others' bets
+   - Choose an action (integer from 0 to 15) based on others' bets
+2. Scoring:
+   - +1 point per player choosing your action (except yourself)
+   - +0.5 points per player choosing your bet
+
+IMPORTANT: Always respond using the exact format specified below. Do not add any extra text or explanations.
+
+Format:
+1. First turn: 
+   <think>
+   Your thoughts on others' bets and your strategy,
+   coupled with the observations you have made.
+   </think>
+   <answer>
+   <personal_bet>Your bet bet_number</personal_bet>
+   </answer>
+
+2. Other turns:
+   You receive: 
+   <round_number>X</round_number>
+   <bets>
+   Player 1: bet
+   Player 2: bet
+   ...
+   </bets>
+
+   You respond:
+   <think>
+   Your thoughts on others' bets and your strategy,
+   coupled with the observations you have made.
+   </think>
+   <answer>
+   <action>Your action (0-15)</action>
+   </answer>
+
+3. After action:
+   You receive:
+   <score>Your score</score>
+   <opponent_choices>
+   Player 1: action
+   Player 2: action
+   ...
+   </opponent_choices>
+
+   You respond:
+   <think>
+   Your thoughts on others' bets and your strategy,
+   coupled with the observations you have made.
+   </think>
+   <answer>
+   <personal_bet>Your next bet (0-15)</personal_bet>
+   </answer>
+
+Start on <game_start>. Only respond in the specified format. Use integers 0-15 for bets and actions.

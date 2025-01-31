@@ -31,8 +31,3 @@ run:
 # Clean the virtual environment
 clean:
 	rm -rf $(VENV_NAME)
-
-# Run the temp_test/main.py script
-run_test:
-	. $(VENV_NAME)/bin/activate && \
-	$(PYTHON) temp_test/main2.py

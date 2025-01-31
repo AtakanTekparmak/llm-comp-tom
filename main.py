@@ -1,25 +1,25 @@
-from src.game import Game, GameConfig
-from src.config import NUM_PLAYERS
+from src.game import Game
+from src.player import Player
+from src.settings import NUM_PLAYERS, MODELS
+import asyncio
 
-from dotenv import load_dotenv
+async def main():
+    # Create players with alternating models
+    players = []
+    model_names = ["deepseek-r1-70b", "deepseek-r1-14b"]  # We want 4 of each
+    players_per_model = NUM_PLAYERS // len(model_names)
+    
+    for model_name in model_names:
+        for i in range(players_per_model):
+            player_number = len(players) + 1
+            players.append(Player(f"Player{player_number}", MODELS[model_name]))
 
-# Define Player configuration
-PLAYERS_CONFIG = [
-    #("qwen2-1.5", NUM_PLAYERS // 2),
-    #("qwen2-0.5", NUM_PLAYERS // 2)
-    #("qwen2-7", NUM_PLAYERS)
-    ("llama3-70b", NUM_PLAYERS)
-]
-
-def main():
-    load_dotenv()
-    config = GameConfig(PLAYERS_CONFIG)
-    game = Game(config)
-    game.play()
+    game = Game(players)
+    await game.play()
     overall_scores = game.get_overall_scores()
-    print("Overall Scores:")
+    print("\nOverall Scores:")
     for player_name, score in overall_scores.items():
         print(f"{player_name}: {score}")
 
 if __name__ == "__main__":
-    main()
+    asyncio.run(main())

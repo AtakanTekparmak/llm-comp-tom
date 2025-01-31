@@ -1,113 +1,60 @@
-from src.model import Model, OllamaModel, GroqModel
-
-import xml.etree.ElementTree as ET
-from xml.etree.ElementTree import ParseError
-
-# Define constants
-MODELS = {
-    "qwen2-0.5": "Qwen/Qwen2-0.5B-Instruct-MLX",
-    "qwen2-1.5": "Qwen/Qwen2-1.5B-Instruct-MLX",
-    "qwen2-7":   "qwen2:7b-instruct-fp16",
-    "llama3-70b": "llama3-70b-8192"
-}
+import re
+from src.model import chat_with_model_async
+from src.settings import NUM_ACTIONS, VERBOSE
+import random
+import asyncio
 
 class Agent:
-    def __init__(self, name: str, system_prompt: str):
+    def __init__(self, name: str, model_name: str, system_prompt: str):
         self.name = name
+        self.model_name = model_name
         self.system_prompt = system_prompt
         self.messages = [
             {"role": "system", "content": system_prompt},
-        ] 
-        self.model = self.get_model_by_name(name)
+        ]
 
-    def get_model_by_name(self, model_name: str):
-        """Returns the model based on the name."""
-        #return Model(model_name=MODELS[model_name])
-        #return OllamaModel(model_name=MODELS[model_name])
-        return GroqModel(model_name=MODELS[model_name])
-    
     def extract_data(self, model_response: str, xml_tag: str):
-        """Extracts data from the model response using the specified XML tag."""
-        # Parse the XML response
-        try:
-            print("Model Response: \n", model_response)
-            # Get the model response after the specified XML tag
-            start_tag = "<" + xml_tag + ">"
-            end_tag = "</" + xml_tag + ">"
-            data = model_response[model_response.index(start_tag) + len(start_tag):model_response.index(end_tag)]
-            return data
-        except ParseError:
-            print("Parse Error for model response: \n", model_response)
-            return None
-    
-    def start_playing(self) -> int:
-        """
-        Starts the game by sending the system prompt. 
-        Returns the personal bet from the agent.
-        """
-        # Add game start prompt to messages
-        self.messages.append({"role": "user", "content": "<game_start>"})
+        if "<think>" in model_response:
+            thoughts = model_response[model_response.find("<think>")+len("<think>"):model_response.find("</think>")]
+            if VERBOSE:
+                print(f"Model {self.model_name} thoughts:\n {thoughts}")
 
-        # Generate the first response
-        #response = self.model.generate(messages=self.messages, verbose=False)
-        response = self.model.generate(messages=self.messages)
-
-        # Extract the personal_bet from the response
-        personal_bet = self.extract_data(response, "personal_bet")
-        print("Personal Bet: ", personal_bet)
-
-        # Add the personal bet to the messages
-        self.messages.append({"role": "assistant", "content": personal_bet})
+        pattern = r"<" + xml_tag + r">\s*(.*?)\s*</" + xml_tag + ">"
+        match = re.search(pattern, model_response, re.DOTALL)
         
-        return personal_bet
-    
-    def reveal_bets(self, round_number: int, public_bets: list[int]) -> int:
-        """
-        Reveals the public bets to the agent.
-        Returns the action from the agent.
-        """
-        # Construct the bets data
-        bets_data = "<round_number>" + str(round_number) + "</round_number>\n<bets>\n"
-        for bet in public_bets:
-            bets_data += "Player " + str(public_bets.index(bet)) + " : " + str(bet) + "\n"
-        bets_data += "</bets>"
+        if match:
+            return match.group(1).strip()
+        else:
+            print(f"Warning: {xml_tag} not found in response: {model_response}")
+            return None
 
-        # Add the public bets to the messages
-        self.messages.append({"role": "user", "content": bets_data})
+    async def generate_and_extract(self, content: str, extract_tag: str) -> int:
+        self.messages.append({"role": "user", "content": content})
+        response = await chat_with_model_async(messages=self.messages, model_name=self.model_name)
+        self.messages.append({"role": "assistant", "content": response})
+        
+        extracted_value = self.extract_data(response, extract_tag)
+        if extracted_value is None:
+            return random.randint(0, NUM_ACTIONS - 1)
+        
+        try:
+            value = int(extracted_value)
+            if 0 <= value < NUM_ACTIONS:
+                return value
+            else:
+                print(f"Value out of range: {value}")
+                return random.randint(0, NUM_ACTIONS - 1)
+        except ValueError:
+            print(f"Invalid {extract_tag}: {extracted_value}")
+            return random.randint(0, NUM_ACTIONS - 1)
 
-        # Generate the response
-        #response = self.model.generate(messages=self.messages, verbose=False)
-        response = self.model.generate(messages=self.messages)
+    async def start_playing(self) -> int:
+        return await self.generate_and_extract("<game_start>", "personal_bet")
 
-        # Extract the action from the response
-        action = self.extract_data(response, "action")
+    async def reveal_bets(self, round_number: int, public_bets: list[int]) -> int:
+        bets_data = f"<round_number>{round_number}</round_number>\n<bets>\n" + "\n".join(f"Player {i}: {bet}" for i, bet in enumerate(public_bets)) + "\n</bets>"
+        return await self.generate_and_extract(bets_data, "action")
 
-        # Add the action to the messages
-        self.messages.append({"role": "assistant", "content": action})
-
-        return action
-
-    def reveal_score_and_actions(self, agent_score: float, opponent_actions: list[int]) -> int:
-        """
-        Reveals the agent's score and opponent actions to the agent.
-        Returns the personal bet from the agent.
-        """
-        # Construct the score and actions data
-        score_actions_data = "<score>" + str(agent_score) + "</score>\n<opponent_choices>\n"
-        for action in opponent_actions:
-            score_actions_data += "Player " + str(opponent_actions.index(action) + " : " + str(action) + "\n")
-        score_actions_data += "</opponent_choices>"
-
-        # Add the score and actions data to the messages
-        self.messages.append({"role": "user", "content": score_actions_data})
-
-        # Generate the response
-        response = self.model.generate(messages=self.messages, verbose=False)
-
-        # Extract the personal bet from the response
-        personal_bet = self.extract_data(response, "personal_bet")
-
-        # Add the feedback to the messages
-        self.messages.append({"role": "assistant", "content": personal_bet})
-
-        return personal_bet
+    async def reveal_score_and_actions(self, agent_score: float, opponent_actions: list[int]) -> int:
+        score_actions_data = f"<score>{agent_score}</score>\n<opponent_choices>\n" + "\n".join(f"Player {i}: {action}" for i, action in enumerate(opponent_actions)) + "\n</opponent_choices>"
+        return await self.generate_and_extract(score_actions_data, "personal_bet")

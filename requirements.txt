@@ -1,12 +1,7 @@
-# MLX & MLM-LM
-mlx 
-mlx-lm
-
-# Ollama
-ollama
-
-# Groq
-groq
-
 # Python-dotenv
 python-dotenv
+
+# OpenAI
+openai
+
+
