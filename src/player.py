@@ -1,5 +1,5 @@
 from src.agent import Agent
-from src.settings import SYSTEM_PROMPT
+from src.settings import load_system_prompt
 from src.config import GameConfig
 
 class Player:
@@ -7,7 +7,8 @@ class Player:
         self.name = name
         self.model_name = model_name
         self.score = 0
-        self.agent = Agent(name, model_name, SYSTEM_PROMPT, config)
+        system_prompt = load_system_prompt(config.num_actions)
+        self.agent = Agent(name, model_name, system_prompt, config)
 
     def get_name(self) -> str:
         return f"{self.name} ({self.model_name})"

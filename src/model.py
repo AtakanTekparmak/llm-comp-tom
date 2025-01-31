@@ -10,26 +10,35 @@ async def chat_with_model_async(messages: list[dict], model_name: str, model_api
 
     for attempt in range(max_retries):
         try:
+            if VERBOSE:
+                print(f"Attempting API call to {model_name} (attempt {attempt + 1}/{max_retries})")
+            
             completion = await client.chat.completions.create(
                 model=model_api_name,
                 messages=messages,
-                max_tokens=max_tokens
+                max_tokens=max_tokens,
+                timeout=30  # Add timeout
             )
             
             if completion and completion.choices:
-                return completion.choices[0].message.content
-            else:
+                response = completion.choices[0].message.content
                 if VERBOSE:
-                    print(f"Warning: Empty response from model {model_name} on attempt {attempt + 1}")
+                    print(f"Successful response from {model_name}")
+                return response
+            else:
+                error_msg = f"Empty response from model {model_name} on attempt {attempt + 1}"
+                if VERBOSE:
+                    print(error_msg)
                 if attempt == max_retries - 1:
-                    return "Error: No response from model"
-                await asyncio.sleep(1)  # Wait before retry
+                    return f"Error: {error_msg}"
+                await asyncio.sleep(1)  # Shorter delay between retries
                 
         except Exception as e:
+            error_msg = f"API error with {model_name} on attempt {attempt + 1}: {str(e)}"
             if VERBOSE:
-                print(f"Error on attempt {attempt + 1} for model {model_name}: {str(e)}")
+                print(error_msg)
             if attempt == max_retries - 1:
-                return f"Error: {str(e)}"
-            await asyncio.sleep(1)  # Wait before retry
+                return f"Error: {error_msg}"
+            await asyncio.sleep(1)  # Shorter delay between retries
     
-    return "Error: Max retries exceeded"
+    return f"Error: Max retries exceeded for {model_name}"

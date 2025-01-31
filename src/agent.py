@@ -126,12 +126,16 @@ class Agent:
         # Handle error responses from the model
         if response.startswith("Error:"):
             print(f"Model error: {response}")
+            # Don't append error responses to message history
+            self.messages.pop()  # Remove the last user message
             return random.randint(0, self.config.num_actions - 1)
         
         self.messages.append({"role": "assistant", "content": response})
         
         extracted_value = self.extract_data(response, extract_tag)
         if extracted_value is None:
+            # Don't keep failed responses in history
+            self.messages = self.messages[:-2]  # Remove both user and assistant messages
             return random.randint(0, self.config.num_actions - 1)
         
         try:
@@ -140,9 +144,11 @@ class Agent:
                 return value
             else:
                 print(f"Value out of range: {value}")
+                self.messages = self.messages[:-2]  # Remove both user and assistant messages
                 return random.randint(0, self.config.num_actions - 1)
         except ValueError:
             print(f"Invalid {extract_tag}: {extracted_value}")
+            self.messages = self.messages[:-2]  # Remove both user and assistant messages
             return random.randint(0, self.config.num_actions - 1)
 
     async def start_playing(self) -> int:
