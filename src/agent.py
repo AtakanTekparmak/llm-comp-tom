@@ -19,14 +19,28 @@ class Agent:
             if VERBOSE:
                 print(f"Model {self.model_name} thoughts:\n {thoughts}")
 
-        pattern = r"<" + xml_tag + r">\s*(.*?)\s*</" + xml_tag + ">"
-        match = re.search(pattern, model_response, re.DOTALL)
-        
-        if match:
-            return match.group(1).strip()
-        else:
-            print(f"Warning: {xml_tag} not found in response: {model_response}")
-            return None
+        patterns = [
+            rf"<{xml_tag}>\s*(.*?)\s*</{xml_tag}>",
+            rf"<{xml_tag}>(.*?)</{xml_tag}>",
+            rf"\[{xml_tag}>(.*?)</{xml_tag}\]",
+            rf"\[(xml_tag)>\s(.*?)\s</{xml_tag}\]",
+            rf"\[{xml_tag}>(.*?)\]",
+            rf"<{xml_tag}>(.*?)(?:<|$)",
+            rf"<{xml_tag}>\s*(\d+)",
+            rf"{xml_tag}>\s*(\d+)",
+        ]
+
+        for pattern in patterns:
+            match = re.search(pattern, model_response, re.DOTALL | re.IGNORECASE)
+            if match:
+                value = match.group(1).strip()
+                number_match = re.search(r'\d+', value)
+                if number_match:
+                    return number_match.group(0)
+                return value
+
+        print(f"Warning: {xml_tag} not found in response: {model_response}")
+        return None
 
     async def generate_and_extract(self, content: str, extract_tag: str) -> int:
         self.messages.append({"role": "user", "content": content})

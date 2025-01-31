@@ -9,8 +9,8 @@ MAX_TOKENS = 16384
 
 # Game settings
 NUM_ACTIONS = 16
-NUM_PLAYERS = 8
-NUM_TURNS = 2
+NUM_PLAYERS = 16
+NUM_TURNS = 8
 
 # Model settings
 MODELS = {
