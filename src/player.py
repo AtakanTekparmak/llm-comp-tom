@@ -12,7 +12,7 @@ class Player:
         return f"{self.name} ({self.model_name})"
 
     async def start_playing(self) -> int:
-        return await self.agent.start_playing()
+        return await self.agent.generate_and_extract("<game_start>", "personal_bet")
 
     async def get_bet(self, previous_actions: list[int]) -> int:
         return await self.agent.reveal_score_and_actions(self.score, previous_actions)

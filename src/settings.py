@@ -9,8 +9,8 @@ MAX_TOKENS = 16384
 
 # Game settings
 NUM_ACTIONS = 16
-NUM_PLAYERS = 16
-NUM_TURNS = 8
+NUM_PLAYERS = 8
+NUM_TURNS = 4
 
 # Model settings
 MODELS = {
@@ -20,7 +20,7 @@ MODELS = {
 }
 
 # General settings
-VERBOSE = True
+VERBOSE = False
 
 # System prompt
 SYSTEM_PROMPT_PATH = "src/system_prompt.txt"
