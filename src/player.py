@@ -1,12 +1,13 @@
 from src.agent import Agent
 from src.settings import SYSTEM_PROMPT
+from src.config import GameConfig
 
 class Player:
-    def __init__(self, name: str, model_name: str):
+    def __init__(self, name: str, model_name: str, config: GameConfig):
         self.name = name
         self.model_name = model_name
         self.score = 0
-        self.agent = Agent(name, model_name, SYSTEM_PROMPT)
+        self.agent = Agent(name, model_name, SYSTEM_PROMPT, config)
 
     def get_name(self) -> str:
         return f"{self.name} ({self.model_name})"

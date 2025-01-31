@@ -1,15 +1,17 @@
 from src.player import Player
-from src.settings import NUM_ACTIONS, NUM_TURNS, VERBOSE, NUM_PLAYERS
+from src.config import GameConfig
+from src.settings import VERBOSE
 import asyncio
 
 class Game:
-    def __init__(self, players: list[Player]):
+    def __init__(self, players: list[Player], config: GameConfig):
         self.players = players
+        self.config = config
         self.turn = 0
         self.previous_actions = []
 
     async def play(self) -> None:
-        while self.turn < NUM_TURNS:
+        while self.turn < self.config.num_turns:
             public_bets = await self.get_public_bets()
             private_actions = await self.get_private_actions(public_bets)
 
@@ -32,11 +34,11 @@ class Game:
         return await asyncio.gather(*tasks)
 
     def calculate_scores(self, public_bets: list[int], private_actions: list[int]) -> list[float]:
-        action_counts = [0] * NUM_ACTIONS
+        action_counts = [0] * self.config.num_actions
         for action in private_actions:
             action_counts[action] += 1
 
-        scores = [0] * NUM_PLAYERS
+        scores = [0] * self.config.num_players
         for player_idx, (bet, action) in enumerate(zip(public_bets, private_actions)):
             score = action_counts[action] + 0.5 * action_counts[bet]
             scores[player_idx] = score

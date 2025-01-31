@@ -1,14 +1,16 @@
 import re
 from src.model import chat_with_model_async
-from src.settings import NUM_ACTIONS, VERBOSE
+from src.settings import VERBOSE
+from src.config import GameConfig
 import random
 import asyncio
 
 class Agent:
-    def __init__(self, name: str, model_name: str, system_prompt: str):
+    def __init__(self, name: str, model_name: str, system_prompt: str, config: GameConfig):
         self.name = name
         self.model_name = model_name
         self.system_prompt = system_prompt
+        self.config = config
         self.messages = [
             {"role": "system", "content": system_prompt},
         ]
@@ -54,7 +56,7 @@ class Agent:
             for match in matches:
                 value = match.group(1).strip()
                 # If we find a valid number, return it immediately
-                if value.isdigit() and 0 <= int(value) < NUM_ACTIONS:
+                if value.isdigit() and 0 <= int(value) < self.config.num_actions:
                     return value
 
         # 2. Try string-based pattern matching if regex fails
@@ -90,18 +92,17 @@ class Agent:
                     value = model_response[start_idx:end_idx].strip()
                     
                     # Try to extract a number from the value
-                    if value.isdigit() and 0 <= int(value) < NUM_ACTIONS:
+                    if value.isdigit() and 0 <= int(value) < self.config.num_actions:
                         return value
 
             # 3. Last resort: scan for any valid number in the entire response
             numbers = re.findall(r'\b(\d+)\b', model_response)
             for num in numbers:
-                if 0 <= int(num) < NUM_ACTIONS:
+                if 0 <= int(num) < self.config.num_actions:
                     return num
 
         except Exception as e:
-            if VERBOSE:
-                print(f"String parsing failed: {e}")
+            print(f"String parsing failed: {e}")
 
         if VERBOSE:
             print(f"Warning: {xml_tag} not found in response: {model_response}")
@@ -109,29 +110,40 @@ class Agent:
 
     async def generate_and_extract(self, content: str, extract_tag: str) -> int:
         self.messages.append({"role": "user", "content": content})
-        response = await chat_with_model_async(messages=self.messages, model_name=self.model_name)
+        
+        # Get the API name from the config's models_dict
+        model_api_name = self.config.models_dict.get(self.model_name)
+        if not model_api_name:
+            print(f"Error: No API name found for model {self.model_name}")
+            return random.randint(0, self.config.num_actions - 1)
+            
+        response = await chat_with_model_async(
+            messages=self.messages, 
+            model_name=self.model_name,
+            model_api_name=model_api_name
+        )
         
         # Handle error responses from the model
         if response.startswith("Error:"):
             print(f"Model error: {response}")
-            return random.randint(0, NUM_ACTIONS - 1)
+            return random.randint(0, self.config.num_actions - 1)
         
         self.messages.append({"role": "assistant", "content": response})
         
         extracted_value = self.extract_data(response, extract_tag)
         if extracted_value is None:
-            return random.randint(0, NUM_ACTIONS - 1)
+            return random.randint(0, self.config.num_actions - 1)
         
         try:
             value = int(extracted_value)
-            if 0 <= value < NUM_ACTIONS:
+            if 0 <= value < self.config.num_actions:
                 return value
             else:
                 print(f"Value out of range: {value}")
-                return random.randint(0, NUM_ACTIONS - 1)
+                return random.randint(0, self.config.num_actions - 1)
         except ValueError:
             print(f"Invalid {extract_tag}: {extracted_value}")
-            return random.randint(0, NUM_ACTIONS - 1)
+            return random.randint(0, self.config.num_actions - 1)
 
     async def start_playing(self) -> int:
         return await self.generate_and_extract("<game_start>", "personal_bet")

@@ -5,19 +5,7 @@ load_dotenv()
 
 # OpenRouter settings
 OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
-MAX_TOKENS = 16384
-
-# Game settings
-NUM_ACTIONS = 16
-NUM_PLAYERS = 8
-NUM_TURNS = 4
-
-# Model settings
-MODELS = {
-    "deepseek-r1-70b": "deepseek/deepseek-r1-distill-llama-70b",
-    "deepseek-r1-32b": "deepseek/deepseek-r1-distill-qwen-32b",
-    "deepseek-r1-14b": "deepseek/deepseek-r1-distill-qwen-14b"
-}
+MAX_TOKENS = 32768
 
 # General settings
 VERBOSE = False
