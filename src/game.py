@@ -12,6 +12,45 @@ class Game:
         # Initialize score history dictionary
         self.model_score_history = {model.name: [] for model in config.models}
 
+    @classmethod
+    def create_game(cls, config: GameConfig) -> 'Game':
+        players = []
+        for model_config in config.models:
+            for i in range(model_config.num_agents):
+                player_number = len(players) + 1
+                players.append(Player(f"Player{player_number}", model_config.name, config))
+        return cls(players, config)
+
+    def display_final_results(self) -> None:
+        print("\n=== Final Results ===")
+        self.display_overall_scores()
+        self.display_average_model_scores()
+        self.display_score_history()
+
+    def display_overall_scores(self) -> None:
+        print("\nOverall Scores:")
+        overall_scores = self.get_overall_scores()
+        for player_name, score in overall_scores.items():
+            print(f"{player_name}: {score:.2f}")
+
+    def display_average_model_scores(self) -> None:
+        print("\nAverage Scores per Model:")
+        model_scores = {model.name: [] for model in self.config.models}
+        for player in self.players:
+            model_scores[player.model_name].append(player.score)
+        
+        for model_name, scores in model_scores.items():
+            avg_score = sum(scores) / len(scores)
+            print(f"{model_name}: {avg_score:.2f}")
+
+    def display_score_history(self) -> None:
+        print("\nScore History per Model:")
+        score_history = self.get_model_score_history()
+        for model_name, history in score_history.items():
+            print(f"\n{model_name}:")
+            for turn, score in enumerate(history):
+                print(f"Turn {turn}: {score:.2f}")
+
     async def play(self) -> None:
         while self.turn < self.config.num_turns:
             public_bets = await self.get_public_bets()
