@@ -1,6 +1,6 @@
 from src.player import Player
 from src.config import GameConfig
-from src.settings import VERBOSE
+from src.settings import VERBOSE, ACTION_REWARD, BET_REWARD
 import asyncio
 
 class Game:
@@ -81,7 +81,7 @@ class Game:
 
         scores = [0] * self.config.num_players
         for player_idx, (bet, action) in enumerate(zip(public_bets, private_actions)):
-            score = action_counts[action] + 0.5 * action_counts[bet]
+            score = ACTION_REWARD * action_counts[action] + BET_REWARD * action_counts[bet]
             scores[player_idx] = score
         return scores
 
