@@ -1,7 +1,15 @@
 # Python-dotenv
-python-dotenv
+python-dotenv>=1.0.0
 
 # OpenAI
-openai
+openai>=1.3.0
+
+# Dependencies for the rating system
+matplotlib>=3.7.0
+pandas>=2.0.0
+
+# Core dependencies for the game
+numpy>=1.24.0
+asyncio>=3.4.3
 
 

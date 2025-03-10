@@ -37,7 +37,7 @@ copy-env:
 run:
 	. $(VENV_NAME)/bin/activate && \
 	$(PYTHON) main.py
-
+	
 # Clean the virtual environment
 clean:
 	rm -rf $(VENV_NAME)
